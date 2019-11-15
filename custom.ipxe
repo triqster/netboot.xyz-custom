@@ -1,12 +1,24 @@
 #!ipxe
-###
-### netboot.xyz-custom menu
-###
 
-:start
-echo Hello world!
-sleep 10
-goto custom_exit
+# CoreOS
+# https://coreos.com
 
-:custom_exit
-exit 0
+:coreos
+set os CoreOS
+menu ${os} Installers
+item --gap Official Releases
+item current ${space} ${os} current
+choose coreos_version || goto coreos_exit
+echo ${cls}
+goto ${coreos_version}
+goto coreos_exit
+
+:current
+set base-url http://stable.release.core-os.net/amd64-usr/current
+kernel ${base-url}/coreos_production_pxe.vmlinuz coreos.first_boot=1 coreos.autologin=tty1 initrd=${initrd}/coreos_production_pxe_image.cpio.gz
+initrd ${base-url}/coreos_production_pxe_image.cpio.gz
+boot || goto coreos_exit
+
+:coreos_exit
+clear menu
+exit
